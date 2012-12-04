@@ -55,7 +55,8 @@ const char *camera_metadata_section_names[ANDROID_SECTION_COUNT] = {
     [ANDROID_STATS]          = "android.statistics",
     [ANDROID_STATS_INFO]     = "android.statistics.info",
     [ANDROID_CONTROL]        = "android.control",
-    [ANDROID_CONTROL_INFO]   = "android.control.info"
+    [ANDROID_CONTROL_INFO]   = "android.control.info",
+    [ANDROID_QUIRKS_INFO]    = "android.quirks.info"
 };
 
 unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
@@ -120,7 +121,9 @@ unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
     [ANDROID_CONTROL]        = { ANDROID_CONTROL_START,
                                  ANDROID_CONTROL_END },
     [ANDROID_CONTROL_INFO]   = { ANDROID_CONTROL_INFO_START,
-                                 ANDROID_CONTROL_INFO_END }
+                                 ANDROID_CONTROL_INFO_END },
+    [ANDROID_QUIRKS_INFO]    = { ANDROID_QUIRKS_INFO_START,
+                                 ANDROID_QUIRKS_INFO_END }
 };
 
 // Shortcut defines to make succint names for field definitions
@@ -134,10 +137,14 @@ tag_info_t android_request[ANDROID_REQUEST_END -
         ANDROID_REQUEST_START] = {
     TIDX(REQUEST, ID)             =
     { "id",            TYPE_INT32 },
+    TIDX(REQUEST, TYPE)  =
+    { "type",          TYPE_BYTE },
     TIDX(REQUEST, METADATA_MODE)  =
     { "metadataMode",  TYPE_BYTE },
     TIDX(REQUEST, OUTPUT_STREAMS) =
     { "outputStreams", TYPE_BYTE },
+    TIDX(REQUEST, INPUT_STREAMS) =
+    { "inputStreams", TYPE_BYTE },
     TIDX(REQUEST, FRAME_COUNT)    =
     { "frameCount",    TYPE_INT32 }
 };
@@ -162,6 +169,8 @@ tag_info_t android_lens_info[ANDROID_LENS_INFO_END -
         ANDROID_LENS_INFO_START] = {
     TIIDX(LENS, MINIMUM_FOCUS_DISTANCE)  =
     { "minimumFocusDistance",               TYPE_FLOAT },
+    TIIDX(LENS, HYPERFOCAL_DISTANCE) =
+    { "hyperfocalDistance",                 TYPE_FLOAT },
     TIIDX(LENS, AVAILABLE_FOCAL_LENGTHS) =
     { "availableFocalLengths",              TYPE_FLOAT },
     TIIDX(LENS, AVAILABLE_APERTURES) =
@@ -170,8 +179,12 @@ tag_info_t android_lens_info[ANDROID_LENS_INFO_END -
     { "availableFilterDensities",           TYPE_FLOAT },
     TIIDX(LENS, AVAILABLE_OPTICAL_STABILIZATION) =
     { "availableOpticalStabilizationModes", TYPE_BYTE },
+    TIIDX(LENS, SHADING_MAP_SIZE) =
+    { "shadingMapSize",                     TYPE_INT32 },
     TIIDX(LENS, SHADING_MAP) =
     { "shadingMap",                         TYPE_FLOAT },
+    TIIDX(LENS, GEOMETRIC_CORRECTION_MAP_SIZE) =
+    { "geometricCorrectionMapSize",         TYPE_INT32 },
     TIIDX(LENS, GEOMETRIC_CORRECTION_MAP) =
     { "geometricCorrectionMap",             TYPE_FLOAT },
     TIIDX(LENS, FACING) =
@@ -202,6 +215,8 @@ tag_info_t android_sensor_info[ANDROID_SENSOR_INFO_END -
     { "availableSensitivities", TYPE_INT32 },
     TIIDX(SENSOR, COLOR_FILTER_ARRANGEMENT) =
     { "colorFilterArrangement", TYPE_BYTE },
+    TIIDX(SENSOR, PHYSICAL_SIZE) =
+    { "physicalSize",           TYPE_FLOAT },
     TIIDX(SENSOR, PIXEL_ARRAY_SIZE) =
     { "pixelArraySize",         TYPE_INT32 },
     TIIDX(SENSOR, ACTIVE_ARRAY_SIZE) =
@@ -248,7 +263,7 @@ tag_info_t android_flash[ANDROID_FLASH_END -
 
 tag_info_t android_flash_info[ANDROID_FLASH_INFO_END -
         ANDROID_FLASH_INFO_START] = {
-    TIIDX(FLASH, AVAILABLE_MODES) =
+    TIIDX(FLASH, AVAILABLE) =
     { "available",      TYPE_BYTE },
     TIIDX(FLASH, CHARGE_DURATION) =
     { "chargeDuration", TYPE_INT64 },
@@ -310,10 +325,7 @@ tag_info_t android_color[ANDROID_COLOR_END -
 };
 
 tag_info_t android_color_info[ANDROID_COLOR_INFO_END -
-        ANDROID_COLOR_INFO_START] = {
-    TIIDX(COLOR, AVAILABLE_MODES) =
-    { "availableModes", TYPE_INT32 }
-};
+        ANDROID_COLOR_INFO_START];
 
 tag_info_t android_tonemap[ANDROID_TONEMAP_END -
         ANDROID_TONEMAP_START] = {
@@ -346,28 +358,28 @@ tag_info_t android_edge_info[ANDROID_EDGE_INFO_END -
 
 tag_info_t android_scaler[ANDROID_SCALER_END -
         ANDROID_SCALER_START] = {
-    TIDX(SCALER, SIZE) =
-    { "size",       TYPE_INT32 },
-    TIDX(SCALER, FORMAT) =
-    { "format",     TYPE_BYTE },
     TIDX(SCALER, CROP_REGION) =
-    { "cropRegion", TYPE_INT32 },
-    TIDX(SCALER, ROTATION) =
-    { "rotation",   TYPE_INT32 },
+    { "cropRegion", TYPE_INT32 }
 };
 
 tag_info_t android_scaler_info[ANDROID_SCALER_INFO_END -
         ANDROID_SCALER_INFO_START] = {
     TIIDX(SCALER, AVAILABLE_FORMATS) =
-    { "availableFormats",           TYPE_INT32 },
-    TIIDX(SCALER, AVAILABLE_SIZES_PER_FORMAT) =
-    { "availableSizesPerFormat",    TYPE_INT32 },
-    TIIDX(SCALER, AVAILABLE_SIZES) =
-    { "availableSizes",             TYPE_INT32 },
-    TIIDX(SCALER, AVAILABLE_MIN_FRAME_DURATIONS) =
-    { "availableMinFrameDurations", TYPE_INT64 },
+    { "availableFormats",          TYPE_INT32 },
+    TIIDX(SCALER, AVAILABLE_RAW_SIZES) =
+    { "availableRawSizes",         TYPE_INT32 },
+    TIIDX(SCALER, AVAILABLE_RAW_MIN_DURATIONS) =
+    { "availableRawMinDurations",  TYPE_INT64 },
+    TIIDX(SCALER, AVAILABLE_PROCESSED_SIZES) =
+    { "availableProcessedSizes",   TYPE_INT32 },
+    TIIDX(SCALER, AVAILABLE_PROCESSED_MIN_DURATIONS) =
+    { "availableProcessedMinDurations", TYPE_INT64 },
+    TIIDX(SCALER, AVAILABLE_JPEG_SIZES) =
+    { "availableJpegSizes",        TYPE_INT32 },
+    TIIDX(SCALER, AVAILABLE_JPEG_MIN_DURATIONS) =
+    { "availableJpegMinDurations", TYPE_INT64 },
     TIIDX(SCALER, AVAILABLE_MAX_ZOOM) =
-    { "availableMaxDigitalZoom",    TYPE_INT32 }
+    { "availableMaxDigitalZoom",   TYPE_INT32 }
 };
 
 tag_info_t android_jpeg[ANDROID_JPEG_END -
@@ -385,13 +397,17 @@ tag_info_t android_jpeg[ANDROID_JPEG_END -
     TIDX(JPEG, GPS_TIMESTAMP) =
     { "gpsTimestamp",        TYPE_INT64 },
     TIDX(JPEG, ORIENTATION) =
-    { "orientation",         TYPE_INT32 }
+    { "orientation",         TYPE_INT32 },
+    TIDX(JPEG, SIZE) =
+    { "size",                TYPE_INT32 }
 };
 
 tag_info_t android_jpeg_info[ANDROID_JPEG_INFO_END -
         ANDROID_JPEG_INFO_START] = {
     TIIDX(JPEG, AVAILABLE_THUMBNAIL_SIZES) =
-    { "availableThumbnailSizes", TYPE_INT32 }
+    { "availableThumbnailSizes", TYPE_INT32 },
+    TIIDX(JPEG, MAX_SIZE) =
+    { "maxSize", TYPE_INT32 }
 };
 
 tag_info_t android_stats[ANDROID_STATS_END -
@@ -435,10 +451,20 @@ tag_info_t android_stats_info[ANDROID_STATS_INFO_END -
 
 tag_info_t android_control[ANDROID_CONTROL_END -
         ANDROID_CONTROL_START] = {
+    TIDX(CONTROL, CAPTURE_INTENT) =
+    { "captureIntent",               TYPE_BYTE },
     TIDX(CONTROL, MODE) =
     { "mode",                        TYPE_BYTE },
+    TIDX(CONTROL, EFFECT_MODE) =
+    { "effectMode",                  TYPE_BYTE },
+    TIDX(CONTROL, SCENE_MODE) =
+    { "sceneMode",                   TYPE_BYTE },
+    TIDX(CONTROL, VIDEO_STABILIZATION_MODE) =
+    { "videoStabilizationMode",      TYPE_BYTE },
     TIDX(CONTROL, AE_MODE) =
     { "aeMode",                      TYPE_BYTE },
+    TIDX(CONTROL, AE_LOCK) =
+    { "aeLock",                      TYPE_BYTE },
     TIDX(CONTROL, AE_REGIONS) =
     { "aeRegions",                   TYPE_INT32 },
     TIDX(CONTROL, AE_EXP_COMPENSATION) =
@@ -447,26 +473,34 @@ tag_info_t android_control[ANDROID_CONTROL_END -
     { "aeTargetFpsRange",            TYPE_INT32 },
     TIDX(CONTROL, AE_ANTIBANDING_MODE) =
     { "aeAntibandingMode",           TYPE_BYTE },
+    TIDX(CONTROL, AE_STATE) =
+    { "aeState",                     TYPE_BYTE },
+    TIDX(CONTROL, AE_PRECAPTURE_ID) =
+    { "aePrecaptureId",              TYPE_INT32},
     TIDX(CONTROL, AWB_MODE) =
     { "awbMode",                     TYPE_BYTE },
+    TIDX(CONTROL, AWB_LOCK) =
+    { "awbLock",                     TYPE_BYTE },
     TIDX(CONTROL, AWB_REGIONS) =
     { "awbRegions",                  TYPE_INT32 },
+    TIDX(CONTROL, AWB_STATE) =
+    { "awbState",                    TYPE_BYTE },
     TIDX(CONTROL, AF_MODE) =
     { "afMode",                      TYPE_BYTE },
     TIDX(CONTROL, AF_REGIONS) =
     { "afRegions",                   TYPE_INT32 },
-    TIDX(CONTROL, AF_TRIGGER) =
-    { "afTrigger",                   TYPE_BYTE },
     TIDX(CONTROL, AF_STATE) =
     { "afState",                     TYPE_BYTE },
-    TIDX(CONTROL, VIDEO_STABILIZATION_MODE) =
-    { "videoStabilizationMode",      TYPE_BYTE }
+    TIDX(CONTROL, AF_TRIGGER_ID) =
+    { "afTriggerId",                 TYPE_INT32 }
 };
 
 tag_info_t android_control_info[ANDROID_CONTROL_INFO_END -
         ANDROID_CONTROL_INFO_START] = {
-    TIIDX(CONTROL, AVAILABLE_MODES) =
-    { "availableModes",              TYPE_BYTE },
+    TIIDX(CONTROL, AVAILABLE_SCENE_MODES) =
+    { "availableSceneModes",         TYPE_BYTE },
+    TIIDX(CONTROL, AVAILABLE_EFFECTS) =
+    { "availableEffects",            TYPE_BYTE },
     TIIDX(CONTROL, MAX_REGIONS) =
     { "maxRegions",                  TYPE_INT32 },
     TIIDX(CONTROL, AE_AVAILABLE_MODES) =
@@ -482,7 +516,21 @@ tag_info_t android_control_info[ANDROID_CONTROL_INFO_END -
     TIIDX(CONTROL, AWB_AVAILABLE_MODES) =
     { "awbAvailableModes",           TYPE_BYTE },
     TIIDX(CONTROL, AF_AVAILABLE_MODES) =
-    { "afAvailableModes",            TYPE_BYTE }
+    { "afAvailableModes",            TYPE_BYTE },
+    TIIDX(CONTROL, AVAILABLE_VIDEO_STABILIZATION_MODES) =
+    { "availableVideoStabilizationModes", TYPE_BYTE },
+    TIIDX(CONTROL, SCENE_MODE_OVERRIDES) =
+    { "sceneModeOverrides", TYPE_BYTE }
+};
+
+tag_info_t android_quirks_info[ANDROID_QUIRKS_INFO_END -
+        ANDROID_QUIRKS_INFO_START] = {
+    TIIDX(QUIRKS, TRIGGER_AF_WITH_AUTO) =
+    { "triggerAfWithAuto", TYPE_BYTE },
+    TIIDX(QUIRKS, USE_ZSL_FORMAT) =
+    { "useZslFormat", TYPE_BYTE },
+    TIIDX(QUIRKS, METERING_CROP_REGION) =
+    { "meteringCropRegion", TYPE_BYTE },
 };
 
 #undef TIDX
@@ -519,5 +567,6 @@ tag_info_t *tag_info[ANDROID_SECTION_COUNT] = {
     android_stats,
     android_stats_info,
     android_control,
-    android_control_info
+    android_control_info,
+    android_quirks_info
 };
